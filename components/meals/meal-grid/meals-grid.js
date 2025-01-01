@@ -1,6 +1,6 @@
 import React from "react";
 import classes from "./meals-grid.module.css";
-import MealItem from "./meal-item";
+import MealItem from "../meal-item/meal-item";
 
 export default function MealsGrid({ meals }) {
   return (

@@ -2,25 +2,26 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { saveMeal } from "./APImeals";
+import formValidator from "../utils/formValidator"
 
-function isInvalidText(text) {
-  return !text || text.trim().length === 0;
-}
+// function isInvalidText(text) {
+//   return !text || text.trim().length === 0;
+// }
 
-function getValuesFromMeal(meal) {
-  // Exclude non-text properties like `image`
-  const filteredValues = Object.entries(meal)
-    .filter(([key, value]) => key !== "image" && typeof value === "string")
-    .map(([, value]) => value);
+// function getValuesFromMeal(meal) {
+//   // Exclude non-text properties like `image`
+//   const filteredValues = Object.entries(meal)
+//     .filter(([key, value]) => key !== "image" && typeof value === "string")
+//     .map(([, value]) => value);
 
-  console.log("Filtered values for validation:", filteredValues);
-  return filteredValues;
-}
+//   console.log("Filtered values for validation:", filteredValues);
+//   return filteredValues;
+// }
 
-const validateMealData = (meal) => {
-  const values = getValuesFromMeal(meal);
-  return values.some(isInvalidText); // Validate text fields
-};
+// const validateMealData = (meal) => {
+//   const values = getValuesFromMeal(meal);
+//   return values.some(isInvalidText); // Validate text fields
+// };
 
 export const shareMeal = async (prevState, formData) => {
   const meal = {
@@ -33,7 +34,7 @@ export const shareMeal = async (prevState, formData) => {
   };
 
   if (
-    validateMealData(meal) || // Invalid text fields
+    formValidator.validateMealData(meal) || // Invalid text fields
     !meal.creator_email.includes("@") || // Invalid email
     !meal.image || // Image not uploaded
     meal.image.size === 0 // Image file is empty
@@ -45,3 +46,20 @@ export const shareMeal = async (prevState, formData) => {
   revalidatePath("/meals");
   redirect("/meals");
 };
+
+export const updateMeal = async (meal) => {
+  if (
+    validateMealData(meal) || // Invalid text fields
+    !meal.creator_email.includes("@") || // Invalid email
+    !meal.image || // Image not uploaded
+    meal.image.size === 0 // Image file is empty
+  ) {
+    return { message: "Invalid input" };
+  }
+
+  await saveMeal(meal);
+  revalidatePath("/meals");
+  redirect("/meals");
+  
+};
+

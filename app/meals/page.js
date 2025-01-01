@@ -1,7 +1,7 @@
 import Link from "next/link";
 import classes from "./page.module.css";
-import MealsGrid from "@/components/meals/meals-grid";
-import getMeals from "@/services/APImeals";
+import MealsGrid from "@/components/meals/meal-grid/meals-grid";
+import { getMeals } from "@/services/APImeals";
 import { Suspense } from "react";
 import MealsLoadingPage from "./loading/loading-out";
 
@@ -26,7 +26,7 @@ export default function MealsPage() {
         </p>
       </header>
       <main className={classes.main}>
-        <Suspense fallback={<MealsLoadingPage/>}>
+        <Suspense fallback={<MealsLoadingPage />}>
           <Meals />
         </Suspense>
       </main>
