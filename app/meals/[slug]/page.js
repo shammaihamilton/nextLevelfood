@@ -3,7 +3,7 @@ import classes from "./page.module.css";
 import Image from "next/image";
 import { getMeal } from "@/services/APImeals";
 import { notFound } from "next/navigation";
-import EditButton from "./edit-button";
+import Link from "next/link";
 
 export default async function MealDetailsPage({ params }) {
   const paramsMeal = await params;
@@ -21,13 +21,17 @@ export default async function MealDetailsPage({ params }) {
 
   return (
     <>
+        <div className={classes.link}>
+          <Link href={`/meals`}>Go back</Link>
+        </div>
       <header className={classes.header}>
         <div className={classes.imageKey}>
           <Image
-            src={`https://shammaihamilton-user-nextjs-demo-images.s3.eu-north-1.amazonaws.com/${meal.imageKey}`}
+            src={meal.imageKey}
             alt={meal.title}
             fill
-            sizes="(max-width: 768px) 100vw, 50vw"
+            // sizes="(max-width: 768px) 100vw, 50vw"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         </div>
         <div className={classes.headerText}>
@@ -36,9 +40,9 @@ export default async function MealDetailsPage({ params }) {
             by <a href={`mailto:${meal.creator_email}`}>{meal.creator}</a>
           </p>
           <p className={classes.summary}>{meal.summary}</p>
-        <div className={classes.actions}>
-          <EditButton slug={paramsMeal.slug} />
-        </div>
+          <div className={classes.actions}>
+            <Link href={`/meals/${paramsMeal.slug}/edit`}>Edit Meal</Link>
+          </div>
         </div>
       </header>
       <main>

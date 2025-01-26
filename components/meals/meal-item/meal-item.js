@@ -7,7 +7,7 @@ import Button from "@/components/shared/button";
 import { useFetchMeal } from "@/hooks/useFetchMeal";
 
 export default function MealItem({ title, slug, imageKey, summary, creator }) {
-  const { deleteMealHandler } = useFetchMeal();
+  const { handleDelete } = useFetchMeal();
 
   const imageUrl = imageKey;
 
@@ -35,7 +35,7 @@ export default function MealItem({ title, slug, imageKey, summary, creator }) {
         <p className={classes.summary}>{summary}</p>
         <div className={classes.actions}>
           <Link href={`/meals/${slug}`}>View Details</Link>
-          <Button onClick={() => deleteMealHandler(slug)}>DELETE</Button>
+          <Button onClick={() => handleDelete(slug)}>Delete</Button>
         </div>
       </div>
     </article>

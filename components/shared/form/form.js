@@ -2,8 +2,8 @@ import classes from "./form.module.css";
 import ImagePicker from "@/components/meals/image-picker/image-picker";
 import MealFormSubmit from "@/components/shared/form/form-submit-button";
 
-function Form({ action, state, meal }) {
-  const safeState = state || { message: "" };
+function Form({ action, state, meal, handleSubmit }) {
+  state = state || { message: "" };
   return (
     <>
       <header className={classes.header}>
@@ -13,7 +13,11 @@ function Form({ action, state, meal }) {
         <p>Or any other meal you feel needs sharing!</p>
       </header>
       <main className={classes.main}>
-        <form className={classes.form} action={action}>
+        <form
+          className={classes.form}
+          action={action ? action : undefined}
+          onSubmit={!action ? (event) => handleSubmit(event) : undefined}
+        >
           <div className={classes.row}>
             <p>
               <label htmlFor="name">Your name</label>
@@ -69,13 +73,14 @@ function Form({ action, state, meal }) {
           <ImagePicker
             label="Your Image"
             name="image"
-            defaultImage={meal ? meal.image : null}
+            defaultImage={meal ? meal.imageKey : null}
           />
-          <p>{safeState.message && <p>{safeState.message}</p>}</p>
+          <p>{state.message && <p>{state.message}</p>}</p>
           <p className={classes.actions}>
-            <MealFormSubmit />
+            <MealFormSubmit meal={meal} />
           </p>
         </form>
+        
       </main>
     </>
   );

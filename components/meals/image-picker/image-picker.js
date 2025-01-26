@@ -4,8 +4,8 @@ import classes from "./image-picker.module.css";
 import Image from "next/image";
 function ImagePicker({ label, name, defaultImage }) {
   const imageInputRef = useRef();
+  const [error, setError] = useState("");
   const [pickedImage, setPickedImage] = useState(defaultImage || null);
-
   useEffect(() => {
     setPickedImage(defaultImage || null);
   }, [defaultImage]);
@@ -14,8 +14,23 @@ function ImagePicker({ label, name, defaultImage }) {
   };
   const handleImageChange = (event) => {
     const file = event.target.files[0];
+    setError("");
     if (!file) {
       setPickedImage(null);
+      console.log("Image not selected. Please select an image.");
+      return;
+    }
+
+    const validTypes = ["image/jpeg", "image/png"];
+    if (!validTypes.includes(file.type)) {
+      setError("Please select a valid PNG or JPEG image.");
+      return;
+    }
+
+    // Validate file size (e.g., max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file.size > maxSize) {
+      setError("Image must be smaller than 5MB.");
       return;
     }
 
@@ -23,27 +38,23 @@ function ImagePicker({ label, name, defaultImage }) {
     fileReader.onload = () => {
       setPickedImage(fileReader.result);
     };
+    fileReader.onerror = () => {
+      setError("Error reading file. Please try again.");
+    };
     fileReader.readAsDataURL(file);
   };
-
-  const imageSrc = pickedImage?.startsWith("data:image")
-    ? pickedImage
-    : `/${pickedImage}`;
-
   return (
     <div className={classes.picker}>
-      <label htmlFor={name}>Choose an Image:</label>
+      <label htmlFor={name}>{label}</label>
       <div className={classes.controls}>
         <div className={classes.preview}>
           {!pickedImage && <p>No image picked yet.</p>}
           {pickedImage && (
             <Image
-              src={imageSrc}
+              src={pickedImage}
               alt="Preview"
-              // width={500} // Set width to define image size
-              // height={500} // Set height to define image size
-              objectFit="contain" // Optional: Adjust object fit for better scaling
               fill
+              sizes="(max-width: 768px) 100vw, 50vw"
             />
           )}
         </div>
@@ -55,16 +66,26 @@ function ImagePicker({ label, name, defaultImage }) {
           name={name}
           ref={imageInputRef}
           onChange={handleImageChange}
-          required
+          required={!pickedImage}
         />
       </div>
       <button
         className={classes.button}
         type="button"
         onClick={handlePickClick}
+        aria-controls={name}
       >
         {defaultImage ? "Replace" : "Pick an Image"}
       </button>
+      {error && (
+        <p
+          className="text-red-600 text-sm mt-1"
+          id={`${name}-error`}
+          role="alert"
+        >
+          {error}
+        </p>
+      )}
     </div>
   );
 }

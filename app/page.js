@@ -3,13 +3,11 @@ import classes from "./page.module.css";
 import ImageSlideshow from "@/components/images/image-slideshow";
 
 export default function Home() {
-
-  
   return (
     <>
       <header className={classes.header}>
         <div className={classes.slideshow}>
-          <ImageSlideshow/>
+          <ImageSlideshow />
         </div>
         <div>
           <div className={classes.hero}>

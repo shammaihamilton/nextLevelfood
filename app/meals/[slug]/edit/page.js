@@ -4,16 +4,17 @@ import { useEffect } from "react";
 import { useFetchMeal } from "@/hooks/useFetchMeal";
 import { useParams } from "next/navigation";
 import Form from "@/components/shared/form/form";
-
-export default  function EditMealPage() {
+import Link from 'next/link';
+export default function EditMealPage() {
   const params = useParams();
   const { loadMeal, meal, isLoading, error, handleSubmit } = useFetchMeal();
 
+  const { slug } = params;
   useEffect(() => {
-    if (params?.slug) {
-      loadMeal(params.slug);
+    if (slug) {
+      loadMeal(slug);
     }
-  }, []);
+  }, [slug]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -26,13 +27,15 @@ export default  function EditMealPage() {
   if (!meal) {
     return <div>Meal not found</div>;
   }
-
   return (
     <>
+      
       <Form
-        action={(event) => handleSubmit(event, params?.slug)}
+        handleSubmit={(e) => handleSubmit(e, slug, meal)}
+        action={null}
         state={null}
         meal={meal}
       />
     </>
-  )}
+  );
+}

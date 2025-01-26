@@ -1,5 +1,6 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { notifySuccess, notifyError } from "@/utils/tostify";
 
 export const useFetchMeal = (url = "api/meals") => {
   const router = useRouter();
@@ -8,107 +9,72 @@ export const useFetchMeal = (url = "api/meals") => {
   const [error, setError] = useState(null);
 
   async function loadMeal(slug) {
+    setIsLoading(true);
     try {
-      console.log(`Fetching meal with slug: ${slug}`);
       const response = await fetch(`/${url}/${slug}`);
       if (!response.ok) {
         throw new Error("Failed to load meal");
       }
       const mealData = await response.json();
       setMeal(mealData);
+      notifySuccess("Meal loaded successfully!");
     } catch (err) {
       console.error(`Error fetching meal: ${err.message}`);
       setError(err.message);
+      notifyError(`Error loading meal: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
   }
 
-  const getMealsHandler = async () => {
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error fetching meals:", error);
-      alert("Failed to fetch meals. Please try again.");
-    }
-  };
+  async function handleSubmit(event, slug, meal) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
 
-  const putMealHandler = async (meal) => {
+    formData.append("slug", slug);
+    const imageInput = event.target.image;
+
+    if (imageInput?.files[0]) {
+      formData.append("image", imageInput.files[0]);
+    } else {
+      formData.append("image", meal?.imageKey || "");
+    }
+
     try {
-      const response = await fetch(`/${url}/${meal.slug}`, {
+      const response = await fetch(`/api/meals/${slug}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(meal),
+        body: formData,
       });
 
       if (!response.ok) {
         throw new Error("Failed to update meal");
       }
-
-      router.refresh(); // Refresh the page to show updated list
+      notifySuccess("Meal updated successfully!");
+      router.push(`/meals/${slug}`);
+      router.refresh();
     } catch (error) {
-      console.error("Error updating meal:", error);
-      alert("Failed to update meal. Please try again.");
+      console.error("Error in handleSubmit:", error.message);
+      setError(error.message);
+      notifyError(`Error updating meal: ${error.message}`);
     }
-  };
+  }
 
-  const deleteMealHandler = async (slug) => {
-    if (!confirm("Are you sure you want to delete this meal?")) {
-      return;
-    }
-
+  async function handleDelete(slug) {
     try {
-      const response = await fetch(`/${url}/${slug}`, {
+      const response = await fetch(`/api/meals/${slug}`, {
         method: "DELETE",
       });
 
       if (!response.ok) {
         throw new Error("Failed to delete meal");
       }
-
-      router.refresh(); // Refresh the page to show updated list
-    } catch (error) {
-      console.error("Error deleting meal:", error);
-      alert("Failed to delete meal. Please try again.");
-    }
-  };
-
-  async function handleSubmit(event, slug) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    
-    const updatedMeal = {
-      ...meal,
-      title: formData.get('title'),
-      summary: formData.get('summary'),
-      instructions: formData.get('instructions'),
-      creator: formData.get('name'),
-      creator_email: formData.get('email'),
-      image: formData.get('image') || meal.image,
-      slug
-    };
-
-    try {
-      const response = await fetch(`/${url}/${slug}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedMeal)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update meal');
-      }
-
-      router.push(`/meals/${slug}`);
+      notifySuccess("Meal deleted successfully!");
+      router.push("/meals");
       router.refresh();
     } catch (error) {
+      console.error("Error in handleDelete:", error.message);
       setError(error.message);
+      notifyError(`Error deleting meal: ${error.message}`);
     }
   }
 
@@ -117,9 +83,7 @@ export const useFetchMeal = (url = "api/meals") => {
     isLoading,
     error,
     loadMeal,
-    deleteMealHandler,
-    putMealHandler,
-    getMealsHandler,
-    handleSubmit
+    handleSubmit,
+    handleDelete,
   };
 };

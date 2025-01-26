@@ -13,8 +13,8 @@ const formValidator = {
     },
   
     validateMealData: function (meal) {
-      const values = this.getValuesFromMeal(meal); // Use `this` to access methods
-      return values.some(this.isInvalidText); // Use `this` for scope
+      const values = this.getValuesFromMeal(meal);
+      return values.some(this.isInvalidText); 
     },
   };
   
