@@ -17,7 +17,6 @@ export const useFetchMeal = (url = "api/meals") => {
       }
       const mealData = await response.json();
       setMeal(mealData);
-      notifySuccess("Meal loaded successfully!");
     } catch (err) {
       console.error(`Error fetching meal: ${err.message}`);
       setError(err.message);

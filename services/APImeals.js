@@ -63,7 +63,6 @@ export async function saveMeal(meal) {
     }
 
     meal.instructions = xss(meal.instructions);
-    console.log("image key :", meal.imageKey);
     meal.imageKey = await uploadImageToS3(meal.imageKey, meal.slug);
     db.prepare(
       `INSERT INTO meals (
